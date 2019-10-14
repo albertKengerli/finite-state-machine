@@ -3,19 +3,29 @@ class FSM {
      * Creates new FSM instance.
      * @param config
      */
-    constructor(config) {}
+    constructor(config) {
+      if (config === undefined) throw new Error("There is no config here!");
+      this.initial = config.initial;
+      this.states = config.states;
+      this.activeState = this.initial;
+    }
 
     /**
      * Returns active state.
      * @returns {String}
      */
-    getState() {}
+    getState() {
+      return this.activeState;
+    }
 
     /**
      * Goes to specified state.
      * @param state
      */
-    changeState(state) {}
+    changeState(state) {
+      if (this.states.hasOwnProperty(state) === false) throw new Error("There is no such state in FSM!");
+      this.activeState = state;
+    }
 
     /**
      * Changes state according to event transition rules.
@@ -59,3 +69,36 @@ class FSM {
 module.exports = FSM;
 
 /** @Created by Uladzimir Halushka **/
+
+const config = {
+  initial: 'normal',
+  states: {
+      normal: {
+          transitions: {
+              study: 'busy',
+          }
+      },
+      busy: {
+          transitions: {
+              get_tired: 'sleeping',
+              get_hungry: 'hungry',
+          }
+      },
+      hungry: {
+          transitions: {
+              eat: 'normal'
+          },
+      },
+      sleeping: {
+          transitions: {
+              get_hungry: 'hungry',
+              get_up: 'normal',
+          },
+      },
+  }
+};
+
+let machine = new FSM(config);
+
+console.log(machine);
+
