@@ -31,7 +31,11 @@ class FSM {
      * Changes state according to event transition rules.
      * @param event
      */
-    trigger(event) {}
+    trigger(event) {
+      if (typeof(this.states[this.activeState].transitions[event]) === 'undefined') throw new Error ("There is no such event in current state!");
+      this.activeState = this.states[this.activeState].transitions[event];
+    }
+        
 
     /**
      * Resets FSM state to initial.
@@ -69,7 +73,7 @@ class FSM {
 module.exports = FSM;
 
 /** @Created by Uladzimir Halushka **/
-
+/*
 const config = {
   initial: 'normal',
   states: {
@@ -97,8 +101,8 @@ const config = {
       },
   }
 };
-
-let machine = new FSM(config);
-
-console.log(machine);
+*/
+// let machine = new FSM(config);
+// machine.trigger("XYINYA");
+//console.log(machine);
 
