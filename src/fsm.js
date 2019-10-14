@@ -40,7 +40,9 @@ class FSM {
     /**
      * Resets FSM state to initial.
      */
-    reset() {}
+    reset() {
+      this.activeState = this.initial;
+    }
 
     /**
      * Returns an array of states for which there are specified event transition rules.
@@ -48,7 +50,19 @@ class FSM {
      * @param event
      * @returns {Array}
      */
-    getStates(event) {}
+    getStates(event) {
+      let allStatesArray = Object.keys(this.states);
+      let statesArray = [];
+           
+      allStatesArray.forEach(state => {
+        for (let i in this.states[state].transitions){
+        if (i === event) statesArray.push(state);
+        }
+        
+      });
+      
+      return (typeof(event) === "undefined") ? allStatesArray : statesArray;
+    }
 
     /**
      * Goes back to previous state.
@@ -73,36 +87,35 @@ class FSM {
 module.exports = FSM;
 
 /** @Created by Uladzimir Halushka **/
-/*
-const config = {
-  initial: 'normal',
-  states: {
-      normal: {
-          transitions: {
-              study: 'busy',
-          }
-      },
-      busy: {
-          transitions: {
-              get_tired: 'sleeping',
-              get_hungry: 'hungry',
-          }
-      },
-      hungry: {
-          transitions: {
-              eat: 'normal'
-          },
-      },
-      sleeping: {
-          transitions: {
-              get_hungry: 'hungry',
-              get_up: 'normal',
-          },
-      },
-  }
-};
-*/
+
+// const config = {
+//   initial: 'normal',
+//   states: {
+//       normal: {
+//           transitions: {
+//               study: 'busy',
+//           }
+//       },
+//       busy: {
+//           transitions: {
+//               get_tired: 'sleeping',
+//               get_hungry: 'hungry',
+//           }
+//       },
+//       hungry: {
+//           transitions: {
+//               eat: 'normal'
+//           },
+//       },
+//       sleeping: {
+//           transitions: {
+//               get_hungry: 'hungry',
+//               get_up: 'normal',
+//           },
+//       },
+//   }
+// };
+
 // let machine = new FSM(config);
-// machine.trigger("XYINYA");
-//console.log(machine);
+// machine.getStates();
 
