@@ -5,6 +5,7 @@ class Stack {
 
   push (element) {
     this.items.push(element);
+    this.length++;
   }
 
   pop () {
@@ -22,6 +23,12 @@ class Stack {
       return true;
     } else return false;
   }
+
+  clear() {
+    while (this.items.length > 0) {
+      this.pop();
+    }
+  }
 }
 
 class FSM {
@@ -35,6 +42,7 @@ class FSM {
       this.states = config.states;
       this.activeState = this.initial;
       this.history = new Stack();
+      this.undoHistory = new Stack();
     }
 
     /**
@@ -53,6 +61,7 @@ class FSM {
       if (this.states.hasOwnProperty(state) === false) throw new Error("There is no such state in FSM!");
       this.history.push(this.activeState);
       this.activeState = state;
+      this.undoHistory.clear();
     }
 
     /**
@@ -63,6 +72,7 @@ class FSM {
       if (typeof(this.states[this.activeState].transitions[event]) === 'undefined') throw new Error ("There is no such event in current state!");
       this.history.push(this.activeState);
       this.activeState = this.states[this.activeState].transitions[event];
+      this.undoHistory.clear();
     }
         
 
@@ -100,6 +110,7 @@ class FSM {
      */
     undo() {
       if (this.history.isEmpty()) return false;
+      this.undoHistory.push(this.activeState);
       this.activeState = this.history.pop();
       return true;
     }
@@ -109,49 +120,22 @@ class FSM {
      * Returns false if redo is not available.
      * @returns {Boolean}
      */
-    redo() {}
+    redo() {
+      if (this.undoHistory.isEmpty()) return false;
+      this.history.push(this.activeState);
+      this.activeState = this.undoHistory.pop();
+      return true;
+    }
 
     /**
      * Clears transition history
      */
-    clearHistory() {}
+    clearHistory() {
+      this.undoHistory.clear();
+      this.history.clear();
+    }
 }
 
 module.exports = FSM;
 
 /** @Created by Uladzimir Halushka **/
-
-const config = {
-  initial: 'normal',
-  states: {
-      normal: {
-          transitions: {
-              study: 'busy',
-          }
-      },
-      busy: {
-          transitions: {
-              get_tired: 'sleeping',
-              get_hungry: 'hungry',
-          }
-      },
-      hungry: {
-          transitions: {
-              eat: 'normal'
-          },
-      },
-      sleeping: {
-          transitions: {
-              get_hungry: 'hungry',
-              get_up: 'normal',
-          },
-      },
-  }
-};
-
-let student = new FSM(config);
-
-
-// student.trigger('study');
-console.log(student.undo());
-console.log(student.getState());
