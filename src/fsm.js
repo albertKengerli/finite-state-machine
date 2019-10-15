@@ -34,6 +34,7 @@ class FSM {
       this.initial = config.initial;
       this.states = config.states;
       this.activeState = this.initial;
+      this.history = new Stack();
     }
 
     /**
@@ -50,6 +51,7 @@ class FSM {
      */
     changeState(state) {
       if (this.states.hasOwnProperty(state) === false) throw new Error("There is no such state in FSM!");
+      this.history.push(this.activeState);
       this.activeState = state;
     }
 
@@ -59,6 +61,7 @@ class FSM {
      */
     trigger(event) {
       if (typeof(this.states[this.activeState].transitions[event]) === 'undefined') throw new Error ("There is no such event in current state!");
+      this.history.push(this.activeState);
       this.activeState = this.states[this.activeState].transitions[event];
     }
         
@@ -95,7 +98,11 @@ class FSM {
      * Returns false if undo is not available.
      * @returns {Boolean}
      */
-    undo() {}
+    undo() {
+      if (this.history.isEmpty()) return false;
+      this.activeState = this.history.pop();
+      return true;
+    }
 
     /**
      * Goes redo to state.
@@ -114,34 +121,37 @@ module.exports = FSM;
 
 /** @Created by Uladzimir Halushka **/
 
-// const config = {
-//   initial: 'normal',
-//   states: {
-//       normal: {
-//           transitions: {
-//               study: 'busy',
-//           }
-//       },
-//       busy: {
-//           transitions: {
-//               get_tired: 'sleeping',
-//               get_hungry: 'hungry',
-//           }
-//       },
-//       hungry: {
-//           transitions: {
-//               eat: 'normal'
-//           },
-//       },
-//       sleeping: {
-//           transitions: {
-//               get_hungry: 'hungry',
-//               get_up: 'normal',
-//           },
-//       },
-//   }
-// };
+const config = {
+  initial: 'normal',
+  states: {
+      normal: {
+          transitions: {
+              study: 'busy',
+          }
+      },
+      busy: {
+          transitions: {
+              get_tired: 'sleeping',
+              get_hungry: 'hungry',
+          }
+      },
+      hungry: {
+          transitions: {
+              eat: 'normal'
+          },
+      },
+      sleeping: {
+          transitions: {
+              get_hungry: 'hungry',
+              get_up: 'normal',
+          },
+      },
+  }
+};
 
-// let machine = new FSM(config);
-// machine.getStates();
+let student = new FSM(config);
 
+
+// student.trigger('study');
+console.log(student.undo());
+console.log(student.getState());
